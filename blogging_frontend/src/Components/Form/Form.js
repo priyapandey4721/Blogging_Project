@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { TextField, Button, Typography, Paper } from "@material-ui/core";
 import useStyles from "./Styles";
 import FileBase from "react-file-base64";
-import { useDispatch } from "react-redux";
-import { createPosts,editPosts } from "../../Actions/posts";
-function Form(currentId, setCurrentId) {
+import { useDispatch, useSelector } from "react-redux";
+import { createPosts, editPosts } from "../../Actions/posts";
+function Form({ currentId, setCurrentId }) {
   const [postData, setPostData] = useState({
     creator: "",
     title: "",
@@ -12,16 +12,34 @@ function Form(currentId, setCurrentId) {
     tags: "",
     selectedFile: "",
   });
-  const clear = () => {};
+  const posts = useSelector((state) =>
+    (currentId ? state.posts.find((p) => p._id === currentId) : null)
+  );
+  const clear = () => {
+    setCurrentId(0);
+    setPostData({
+      creator: "",
+      title: "",
+      message: "",
+      tags: "",
+      selectedFile: "",
+    });
+  };
   const dispatch = useDispatch();
   const classes = useStyles();
-  const handleSubmit = (e) => {
+  useEffect(() => {
+    if (posts) setPostData(posts);
+  }, [posts]);
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (currentId) {
-      dispatch(editPosts(currentId,postData));
-    }else{
-    dispatch(createPosts(postData));
+    if (currentId === 0) {
+      dispatch(createPosts(postData));
+      clear();
+    } else {
+      dispatch(editPosts(currentId, postData));
+      clear();
     }
+    window.location.reload()
   };
   return (
     <Paper className="classes.paper">
@@ -31,7 +49,9 @@ function Form(currentId, setCurrentId) {
         className={`${classes.root} ${classes.form}`}
         onSubmit={handleSubmit}
       >
-        <Typography variant="h6">Creating a Blog</Typography>
+        <Typography variant="h6">
+          {currentId ? `Editing "${posts.title}"` : "Creating a Blog"}{" "}
+        </Typography>
         <TextField
           name="creator"
           variant="outlined"
@@ -66,7 +86,9 @@ function Form(currentId, setCurrentId) {
           label="Tags"
           fullWidth
           value={postData.tags}
-          onChange={(e) => setPostData({ ...postData, tags: e.target.value })}
+          onChange={(e) =>
+            setPostData({ ...postData, tags: e.target.value.split(",") })
+          }
         />
         <div className={classes.fileInput}>
           <FileBase
@@ -88,7 +110,6 @@ function Form(currentId, setCurrentId) {
           Submit
         </Button>
         <Button
-          className={classes.buttonSubmit}
           variant="contained"
           color="secondary"
           size="small"

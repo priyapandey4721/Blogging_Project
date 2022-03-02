@@ -10,3 +10,9 @@ export function createPosts(newPost) {
 export function editPosts(id,editPosts){
   return axios.patch(`${MAIN_URL}posts/editposts/${id}`,editPosts)
 }
+export function deletePost(id){
+  return axios.delete(`${MAIN_URL}posts/deletepost/${id}`)
+}
+export function likePosts(id){
+  return axios.patch(`${MAIN_URL}posts/likepost/${id}/likePost`)
+}

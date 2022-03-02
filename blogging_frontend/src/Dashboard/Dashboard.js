@@ -7,12 +7,12 @@ import useStyles from './Styles'
 import { useDispatch } from 'react-redux'
 import image from '../Images/blogging.png'
 function Dashboard() {
-    const [currentId,setCurrentId] =useState('')
+    const [currentId,setCurrentId] =useState(0)
     const classes = useStyles();
     const dispatch = useDispatch();
     useEffect(()=>{
         dispatch(getPosts());
-    },[dispatch])
+    },[currentId,dispatch])
   return (
     <Container maxWidth="lg">
         <AppBar className={classes.appBar} position='static' color='inherit'>
@@ -21,12 +21,12 @@ function Dashboard() {
         </AppBar>
         <Grow in>
             <Container>
-                <Grid container justify='space-between' alignItems='stretch' spacing={3}>
+                <Grid container className={classes.mainContainer} justify='space-between' alignItems='stretch' spacing={3}>
                     <Grid item xs ={12} sm={7}>
                         <Posts setCurrentId={setCurrentId}/>
                     </Grid>
                     <Grid item xs ={12} sm={4}>
-                            <Form currentId={currentId}/>
+                            <Form currentId={currentId} setCurrentId={setCurrentId}/>
                     </Grid>
                 </Grid>
             </Container>
